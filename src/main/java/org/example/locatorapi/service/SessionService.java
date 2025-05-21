@@ -1,7 +1,10 @@
 package org.example.locatorapi.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.locatorapi.dto.LocationUpdateRequest;
 import org.example.locatorapi.dto.SessionCreateResponse;
+import org.example.locatorapi.events.EmailShareLinkEvent;
+import org.example.locatorapi.kafka.Sender;
 import org.example.locatorapi.model.GeoLocation;
 import org.example.locatorapi.model.Participant;
 import org.example.locatorapi.model.Session;
@@ -17,9 +20,11 @@ import java.util.UUID;
 public class SessionService {
 
     private final SessionRepository sessionRepository;
+    private final Sender sender;
 
-    public SessionService(SessionRepository sessionRepository) {
+    public SessionService(SessionRepository sessionRepository, Sender sender) {
         this.sessionRepository = sessionRepository;
+        this.sender            = sender;
     }
 
     public SessionCreateResponse createSession(String displayName) {
@@ -31,6 +36,25 @@ public class SessionService {
         Session session = new Session(sessionId, new ArrayList<>(List.of(participant)), LocalDateTime.now());
         sessionRepository.save(session);
         return new SessionCreateResponse(sessionId, null, userId);
+    }
+
+    public SessionCreateResponse createSession(String displayName, List<String> inviteEmails) {
+
+        String sessionId = UUID.randomUUID().toString();
+        String userId    = UUID.randomUUID().toString();
+
+        Participant host = new Participant(userId, displayName, null, null);
+        Session session  = new Session(sessionId, new ArrayList<>(List.of(host)), LocalDateTime.now());
+
+        sessionRepository.save(session);
+
+        String shareLink = "http://localhost:8080/api/v1/session/join/" + sessionId;
+
+        if (inviteEmails != null && !inviteEmails.isEmpty()) {
+            sender.publish(new EmailShareLinkEvent(sessionId, shareLink, inviteEmails));
+        }
+
+        return new SessionCreateResponse(sessionId, shareLink, userId);
     }
 
     public Session joinSession(String sessionId, String userId, String displayName) {

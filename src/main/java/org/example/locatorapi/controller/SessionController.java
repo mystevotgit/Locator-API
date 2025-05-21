@@ -1,9 +1,6 @@
 package org.example.locatorapi.controller;
 
-import org.example.locatorapi.dto.LocationUpdateRequest;
-import org.example.locatorapi.dto.SessionCreateResponse;
-import org.example.locatorapi.dto.SessionJoinRequest;
-import org.example.locatorapi.dto.SessionStatusResponse;
+import org.example.locatorapi.dto.*;
 import org.example.locatorapi.model.Session;
 import org.example.locatorapi.service.DistanceCalculator;
 import org.example.locatorapi.service.SessionService;
@@ -21,6 +18,12 @@ public class SessionController {
 
     public SessionController(SessionService sessionService) {
         this.sessionService = sessionService;
+    }
+
+    @PostMapping
+    public ResponseEntity<SessionCreateResponse> createSession(@RequestBody SessionCreateRequest req) {
+        SessionCreateResponse resp = sessionService.createSession(req.getDisplayName(), req.getInviteEmails());
+        return ResponseEntity.ok(resp);
     }
 
     @PostMapping("/{displayName}")
