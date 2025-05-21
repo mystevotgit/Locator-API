@@ -19,8 +19,8 @@ public class RateLimitingFilter implements Filter {
     private Bucket getBucket(String clientId) {
         return buckets.computeIfAbsent(clientId, k ->
                 Bucket.builder()
-                        // low capacity=2 and duration of seconds=10 for testing purposes, increase accordingly
-                        .addLimit(Bandwidth.classic(2, Refill.intervally(1, Duration.ofSeconds(10))))
+                        // low capacity=3 and duration of seconds=8 for testing purposes, increase accordingly
+                        .addLimit(Bandwidth.classic(3, Refill.intervally(1, Duration.ofSeconds(8))))
                         .build()
         );
     }
