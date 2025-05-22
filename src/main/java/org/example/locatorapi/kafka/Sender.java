@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.locatorapi.events.EmailShareLinkEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,6 +15,7 @@ public class Sender {
     @Value("${locator.kafka.topic.session-created}")
     private String topic;
 
+    @Async
     public void publish(EmailShareLinkEvent evt) {
         kafka.send(topic, evt.getSessionId(), evt);
     }

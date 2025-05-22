@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class SessionCreateResponse {
     private String sessionId;
     private String shareLink;
+    private int passCode;
     private String userId;
 }
