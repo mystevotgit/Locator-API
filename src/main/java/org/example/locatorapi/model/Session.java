@@ -17,6 +17,10 @@ public class Session {
     @Id
     private String sessionId;
 
+    private int passCode;
+
+    private String creatorUserId;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "session_id")
     private List<Participant> participants = new ArrayList<>();
